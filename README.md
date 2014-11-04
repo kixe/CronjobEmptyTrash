@@ -22,12 +22,15 @@ kixe (Christoph Thelen)
 
 ## Bugs
 
-### 1: function is called twice. double entry in log file (message.txt)
-### 2: message cannot be displayed because lazycron hooks in pageView::finished and not in PageView::ready
+### 1:
+function is called twice. double entry in log file (message.txt)
+### 2:
+message cannot be displayed because lazycron hooks in pageView::finished and not in PageView::ready
 
 ## Development notices
 
-### 1: difference?
+### 1:
+difference?
 ´´´
 		//$trashed = $this->wire('pages')->find('parent=7, include=all');
 		$trashed = $this->wire('pages')->find('status>=8192, include=all');
