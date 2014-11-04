@@ -19,35 +19,3 @@ By default this module runs only if current user has page-delete permission.
 
 ## Author
 kixe (Christoph Thelen)
-
-## Bugs
-
-### 1:
-function is called twice. double entry in log file (message.txt)
-### 2:
-message cannot be displayed because lazycron hooks in pageView::finished and not in PageView::ready
-
-## Development notices
-
-### 1:
-difference?
-´´´
-		//$trashed = $this->wire('pages')->find('parent=7, include=all');
-		$trashed = $this->wire('pages')->find('status>=8192, include=all');
-´´´
-
-### 2: 
-´´´
-		//$display=($this->wire('user')->isSuperuser)?true:false;
-		//$display = true;
-		$this->message($message,true);
-		
-		//statusTrash = 8192
-		//statusDeleted = 16384
-		//trash page id = 7
-
-
-´´´
-
-		
-
