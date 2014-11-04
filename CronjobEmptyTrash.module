@@ -1,0 +1,129 @@
+<?php
+
+/**
+ * ProcessWire Module Cronjob Empty Trash
+ *
+ * 
+ * Auto delete trashed pages sustainably after a predifined period of time set in module settings.
+ * This cronjob will run once per day.
+ * 
+ * made by kixe (Christoph Thelen) 04.11.14
+ * Licensed under GNU/GPL v3
+ * 
+ * 
+ * ProcessWire 2.x 
+ * Copyright (C) 2014 by Ryan Cramer 
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ * 
+ * http://processwire.com
+ *
+ */
+
+class CronjobEmptyTrash extends Process implements ConfigurableModule {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => __('Cronjob Empty Trash'), 
+			'version' => 100,
+			'summary' => __('Auto delete trashed pages sustainably after a predifined period of time set in module settings. This cronjob will run once per day.'),
+			'autoload' => true,
+			'singular' => true,
+			'author' => 'kixe',
+			'license' => 'GNU-GPLv3',
+			'hreflicense' => 'http://www.gnu.org/licenses/gpl-3.0.html',
+			'requires' => array(
+					'LazyCron'
+					),
+			'icon' => 'clock-o'
+		);
+	}
+
+	static public function getDefaultConfig() {
+		return array(
+			'expiry' => '0', // default set to never delete
+			'permission' => 0
+		);
+	}
+
+	public function __construct() {
+		foreach(self::getDefaultConfig() as $key => $value) {
+			$this->$key = $value;
+		}
+	}
+
+	/**
+	* Initialize
+	* hooks in Lazy Cron
+	* set interval of script execution here
+	* check syntax of hookable time functions in wire/modules/LazyCron.module
+	*
+	*/
+	public function init() {
+		//if ($this->permission || $this->wire('user')->hasPermission('page-delete')) $this->addHook('LazyCron::every30Seconds', $this, 'deletePages'); // for development
+		if ($this->permission || $this->wire('user')->hasPermission('page-delete')) $this->addHook('LazyCron::everyDay', $this, 'deletePages'); 
+		parent::init();
+	}
+	
+	/**
+	* hooky dooky
+	*
+	*/
+	public function deletePages(HookEvent $e) {
+		if ($this->expiry == 0) return;
+		$trashed = $this->wire('pages')->find('status>=8192, include=all');
+		if(empty($trashed)) return; // no page in trash
+		$del ='';
+		foreach ($trashed as $trash) {
+			if (date($trash->modified)+$this->expiry > time()) continue;
+			try {
+				$this->wire('pages')->delete($trash, true);
+			} catch(Exception $e) {
+				$this->error($e->getMessage(), Notice::logOnly); 
+			}
+			//if (!$this->wire('pages')->delete($trash, true)) continue; // replaced by try-catch
+			$del .= $trash->id.'|';
+		}
+		if(!strlen($del)) return; // no page found which stays in trash longer than expiry
+
+		$del = rtrim($del,'|');
+		$message = sprintf($this->_("Page%s [id=%s] deleted by module CronjobEmptyTrash{$data['permission']}"),(stripos($del,'|')?'s':''),$del);
+		$this->message($message,true);
+	}
+
+	/**
+	 * module settings
+	 *
+	 */
+	static public function getModuleConfigInputfields(array $data) {
+
+		$fields = new InputfieldWrapper();
+		$modules = wire('modules');
+		$defaults = self::getDefaultConfig();
+		$data = array_merge($defaults, $data);
+
+		$field = $modules->get("InputfieldRadios");
+		$field->name = "expiry";
+		$field->label = "Deletion Deadline";
+		$field->description = "Choose the time interval after a page will be deleted sustainably after moving to the trash bin.";
+		$field->addOption('0', 'never');
+		//$field->addOption('1', '1 second'); //for development use
+		//$field->addOption('60', '1 minute'); //for development use
+		$field->addOption('86400',  __('after 24 hours')); // all values in seconds
+		$field->addOption('604800',  __('after 1 week'));
+		$field->addOption('2592000',  __('after 1 month'));
+		$field->addOption('31536000',  __('after 1 year'));
+		$field->value = $data['expiry'];
+
+		$fields->add($field);
+
+		$field = wire('modules')->get("InputfieldCheckbox");
+        $field->attr('name', 'permission');
+        $field->label = __('Global Trigger');
+        $field->description = __('Deletion ');
+        $field->attr('checked', $data['permission'] ? 'checked' : '' );
+        $field->notes = __("Global Trigger");
+        $fields->add($field);
+		return $fields;
+	}
+
+}
