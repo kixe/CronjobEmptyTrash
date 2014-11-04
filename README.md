@@ -8,11 +8,11 @@ This cronjob (based on Lazy Cron) will only be executed by a call to module: 'Pr
 By default this module runs only if current user has page-delete permission.
 
 ## Settings
-**Deletion Deadline** Select the period of time pages will remain untouched in the trash.
-**Global trigger** Check this to trigger this cronjob by every user (guest)
++ **Deletion Deadline** Select the period of time pages will remain untouched in the trash.
++ **Global trigger** Check this to trigger this cronjob by every user (guest)
 
 ## Require
-**LazyCron.module**
+*LazyCron.module*
 
 ## License
 [GNU-GPLv3](http://www.gnu.org/licenses/gpl-3.0.html)
