@@ -59,7 +59,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 	*
 	*/
 	public function init() {
-		//if ($this->permission || $this->wire('user')->hasPermission('page-delete')) $this->addHook('LazyCron::every30Seconds', $this, 'deletePages'); // for development
+		//if ($this->permission || $this->wire('user')->hasPermission('page-delete')) $this->addHook('LazyCron::every30Seconds', $this, 'deletePages'); // for development use
 		if ($this->permission || $this->wire('user')->hasPermission('page-delete')) $this->addHook('LazyCron::everyDay', $this, 'deletePages'); 
 		parent::init();
 	}
@@ -87,7 +87,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 
 		$del = rtrim($del,'|');
 		$message = sprintf($this->_("Page%s [id=%s] deleted by module CronjobEmptyTrash{$data['permission']}"),(stripos($del,'|')?'s':''),$del);
-		$this->message($message,true);
+		$this->message($message,true); // 'true' has no effect for now because render of page is done when hook is called
 	}
 
 	/**
@@ -119,9 +119,9 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 		$field = wire('modules')->get("InputfieldCheckbox");
         $field->attr('name', 'permission');
         $field->label = __('Global Trigger');
-        $field->description = __('Deletion ');
+        $field->description = __('Check to trigger this cronjob by every user (guest)');
         $field->attr('checked', $data['permission'] ? 'checked' : '' );
-        $field->notes = __("Global Trigger");
+        $field->notes = __("This cronjob (based on Lazy Cron) will only be executed by a call to module: 'Process Page View'. By default this module runs only if current user has page-delete permission.");
         $fields->add($field);
 		return $fields;
 	}
