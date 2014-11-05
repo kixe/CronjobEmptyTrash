@@ -4,8 +4,9 @@ CRONJOB EMPTY TRASH
 Auto delete trashed pages sustainably after a predifined period of time set in module settings.
 This cronjob will run once per day.
 
-This cronjob (based on Lazy Cron) will only be executed by a call to module: 'Process Page View'.
+This cronjob (hooks on *LazyCron*) is executed by a call to module: *ProcessPageView*.
 By default this module runs only if current user has page-delete permission.
+Deletion is logged in assets/logs/ messages.txt
 
 ## Settings
 + **Deletion Deadline**

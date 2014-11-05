@@ -74,13 +74,16 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 		if(empty($trashed)) return; // no page in trash
 		$del ='';
 		foreach ($trashed as $trash) {
-			if (date($trash->modified)+$this->expiry > time()) continue;
+			if (date($trash->modified)+$this->expiry > time()) continue;			
+			if (!$this->wire('pages')->isDeleteable($trash)) { // I have problems with the english word deletEable
+				$this->error("CronjobEmptyTrash: Page[id={$trash->id}] with status={$trash->status} is not deletable", Notice::logOnly);
+				continue;
+			}
 			try {
 				$this->wire('pages')->delete($trash, true);
 			} catch(Exception $e) {
 				$this->error($e->getMessage(), Notice::logOnly); 
 			}
-			//if (!$this->wire('pages')->delete($trash, true)) continue; // replaced by try-catch
 			$del .= $trash->id.'|';
 		}
 		if(!strlen($del)) return; // no page found which stays in trash longer than expiry
@@ -119,9 +122,9 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 		$field = wire('modules')->get("InputfieldCheckbox");
         $field->attr('name', 'permission');
         $field->label = __('Global Trigger');
-        $field->description = __('Check to trigger this cronjob by every user (guest)');
+        $field->description = __('Check to trigger this cronjob by every user (even guest user)');
         $field->attr('checked', $data['permission'] ? 'checked' : '' );
-        $field->notes = __("This cronjob (based on Lazy Cron) will only be executed by a call to module: 'Process Page View'. By default this module runs only if current user has page-delete permission.");
+        $field->notes = __("By default this module runs only if current user has page-delete permission.");
         $fields->add($field);
 		return $fields;
 	}
