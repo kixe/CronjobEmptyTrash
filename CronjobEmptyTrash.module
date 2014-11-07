@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 /**
  * ProcessWire Module Cronjob Empty Trash
@@ -16,6 +16,11 @@
  * Licensed under GNU/GPL v2, see LICENSE.TXT
  * 
  * http://processwire.com
+ *
+ * TODO:
+ * messages are not displayed since LazyCron hooks in ProcessPageView::finished and not ProcessPageView::ready
+ * solution?
+ *
  *
  */
 
@@ -90,7 +95,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 
 		$del = rtrim($del,'|');
 		$message = sprintf($this->_("Page%s [id=%s] deleted by module CronjobEmptyTrash{$data['permission']}"),(stripos($del,'|')?'s':''),$del);
-		$this->message($message,true); // 'true' has no effect for now because render of page is done when hook is called
+		$this->message($message,true); // 'true' has no effect for now because render of page is done when hook is called (TODO)
 	}
 
 	/**
@@ -106,6 +111,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 
 		$field = $modules->get("InputfieldRadios");
 		$field->name = "expiry";
+		$field->icon = "trash-o";
 		$field->label = "Deletion Deadline";
 		$field->description = "Choose the time interval after a page will be deleted sustainably after moving to the trash bin.";
 		$field->addOption('0', 'never');
@@ -121,7 +127,8 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 
 		$field = wire('modules')->get("InputfieldCheckbox");
         $field->attr('name', 'permission');
-        $field->label = __('Global Trigger');
+		$field->set('collapsed', $data['permission']?false:true);
+		$field->label = __('Global Trigger');
         $field->description = __('Check to trigger this cronjob by every user (even guest user)');
         $field->attr('checked', $data['permission'] ? 'checked' : '' );
         $field->notes = __("By default this module runs only if current user has page-delete permission.");
