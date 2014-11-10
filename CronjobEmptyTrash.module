@@ -29,7 +29,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			'title' => __('Cronjob Empty Trash'), 
-			'version' => 100,
+			'version' => 101,
 			'summary' => __('Auto delete trashed pages sustainably after a predifined period of time set in module settings. This cronjob will run once per day.'),
 			'autoload' => true,
 			'singular' => true,
@@ -39,7 +39,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 			'requires' => array(
 					'LazyCron'
 					),
-			'icon' => 'clock-o'
+			'icon' => 'history'
 		);
 	}
 
@@ -80,7 +80,8 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 		$del ='';
 		foreach ($trashed as $trash) {
 			if (date($trash->modified)+$this->expiry > time()) continue;			
-			if (!$this->wire('pages')->isDeleteable($trash)) { // I have problems with the english word deletEable
+			// Damn I have always problems with the english word deletEable I type it always deletable and get an error
+			if (!$this->wire('pages')->isDeleteable($trash)) {
 				$this->error("CronjobEmptyTrash: Page[id={$trash->id}] with status={$trash->status} is not deletable", Notice::logOnly);
 				continue;
 			}
@@ -126,7 +127,8 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 		$fields->add($field);
 
 		$field = wire('modules')->get("InputfieldCheckbox");
-        $field->attr('name', 'permission');
+ 		$field->icon = "globe";
+		$field->attr('name', 'permission');
 		$field->set('collapsed', $data['permission']?false:true);
 		$field->label = __('Global Trigger');
         $field->description = __('Check to trigger this cronjob by every user (even guest user)');
