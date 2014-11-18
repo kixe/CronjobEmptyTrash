@@ -36,9 +36,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 			'author' => 'kixe',
 			'license' => 'GNU-GPLv3',
 			'hreflicense' => 'http://www.gnu.org/licenses/gpl-3.0.html',
-			'requires' => array(
-					'LazyCron'
-					),
+			'requires' => array('LazyCron'),
 			'icon' => 'history'
 		);
 	}
