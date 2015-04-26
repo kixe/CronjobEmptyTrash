@@ -29,7 +29,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			'title' => __('Cronjob Empty Trash'), 
-			'version' => 101,
+			'version' => 102,
 			'summary' => __('Auto delete trashed pages sustainably after a predifined period of time set in module settings. This cronjob will run once per day.'),
 			'autoload' => true,
 			'singular' => true,
@@ -62,7 +62,8 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 	*
 	*/
 	public function init() {
-		//if ($this->permission || $this->wire('user')->hasPermission('page-delete')) $this->addHook('LazyCron::every30Seconds', $this, 'deletePages'); // for development use
+		// for development use
+		//if ($this->permission || $this->wire('user')->hasPermission('page-delete')) $this->addHook('LazyCron::every30Seconds', $this, 'deletePages');
 		if ($this->permission || $this->wire('user')->hasPermission('page-delete')) $this->addHook('LazyCron::everyDay', $this, 'deletePages'); 
 		parent::init();
 	}
@@ -108,7 +109,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 		$defaults = self::getDefaultConfig();
 		$data = array_merge($defaults, $data);
 
-		$field = $modules->get("InputfieldRadios");
+		$field = $modules->get("InputfieldSelect");
 		$field->name = "expiry";
 		$field->icon = "trash-o";
 		$field->label = "Deletion Deadline";
@@ -116,7 +117,10 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 		$field->addOption('0', 'never');
 		//$field->addOption('1', '1 second'); //for development use
 		//$field->addOption('60', '1 minute'); //for development use
-		$field->addOption('86400',  __('after 24 hours')); // all values in seconds
+		$field->addOption('3600', __('after 1 hour')); // all values in seconds
+		$field->addOption('43200', __('after 12 hours')); // all values in seconds
+		$field->addOption('86400',  __('after 24 hours'));
+		$field->addOption('172800',  __('after 2 days'));
 		$field->addOption('604800',  __('after 1 week'));
 		$field->addOption('2592000',  __('after 1 month'));
 		$field->addOption('31536000',  __('after 1 year'));
