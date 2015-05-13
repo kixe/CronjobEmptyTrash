@@ -41,6 +41,8 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 		);
 	}
 
+	protected $data;
+
 	static public function getDefaultConfig() {
 		return array(
 			'expiry' => '0', // default set to never delete
