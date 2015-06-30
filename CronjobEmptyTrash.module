@@ -96,7 +96,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 		if(!strlen($del)) return; // no page found which stays in trash longer than expiry
 
 		$del = rtrim($del,'|');
-		$message = sprintf($this->_("Page%s [id=%s] deleted by module CronjobEmptyTrash{$data['permission']}"),(stripos($del,'|')?'s':''),$del);
+		$message = sprintf($this->_("Deleted trashed page%s [id=%s] permanent."),(stripos($del,'|')?'s':''),$del);
 		$this->message($message,true); // 'true' has no effect for now because render of page is done when hook is called (TODO)
 	}
 
