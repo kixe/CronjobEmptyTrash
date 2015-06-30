@@ -29,7 +29,7 @@ class CronjobEmptyTrash extends Process implements ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			'title' => __('Cronjob Empty Trash'), 
-			'version' => 102,
+			'version' => 103,
 			'summary' => __('Auto delete trashed pages sustainably after a predifined period of time set in module settings. This cronjob will run once per day.'),
 			'autoload' => true,
 			'singular' => true,
